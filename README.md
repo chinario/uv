@@ -43,9 +43,16 @@ This fork contains custom modifications to the original uv codebase. When updati
 
 ### GitHub Actions
 
-Some GitHub Actions workflows may need to be adjusted for this fork, particularly:
-- Workflows that check `github.repository == 'astral-sh/uv'` may need to be modified
-- Publishing workflows may need to be updated to work with this fork
+The original repository's GitHub Actions workflows have been preserved in this fork. To use them properly:
+
+1. Some workflows contain conditions that restrict execution to the official repository (e.g., `github.repository == 'astral-sh/uv'`). These need to be modified to include your fork:
+   ```yaml
+   if: github.repository == 'astral-sh/uv' || github.repository == 'chinario/uv'
+   ```
+
+2. For publishing workflows to work, you'll need to set up appropriate secrets in your repository settings.
+
+3. See [GITHUB_ACTIONS_GUIDE.md](GITHUB_ACTIONS_GUIDE.md) for detailed instructions on adapting the workflows for your fork.
 
 ## Installation
 

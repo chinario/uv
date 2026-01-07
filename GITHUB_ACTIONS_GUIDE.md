@@ -17,48 +17,25 @@ Several workflows contain conditions that restrict execution to the official rep
 if: github.repository == 'astral-sh/uv' || github.repository == 'chinario/uv'
 ```
 
-### 2. Publishing Workflows
+### 2. Additional Repository-Specific Changes
 
-- **publish-pypi.yml**: Contains PyPI publishing configurations
-- **publish-docs.yml**: References `astral-sh/docs.git` specifically
+In **build-docker.yml**, you may need to update:
+- Line 147: Project identifier for your repository if using Depot
+- Line 296: Project identifier for your repository if using Depot
+- Docker image names if you want to customize them for your fork (UV_DOCKERHUB_IMAGE in the env section)
 
-### 3. Docker Build Workflows
+### 3. Publishing Workflows
 
-- **build-docker.yml**: Contains Project IDs specific to astral-sh (`project: 7hd4vdzmw5 # astral-sh/uv`)
+For publishing workflows to work with your fork, you may need to update:
+- **publish-pypi.yml**: Update PyPI project details if you want to publish to your own PyPI repository
+- **publish-crates.yml**: Update Cargo registry details if you want to publish to your own crate registry
+- **publish-docs.yml**: Update documentation deployment settings
+- **release.yml**: Update release process for your fork
 
-## Recommended Changes
+### 4. Environment Variables and Secrets
 
-### For Continuous Integration (CI)
-
-Update the conditions in `.github/workflows/ci.yml` to allow your repository:
-
-```yaml
-# Change from:
-if: github.repository == 'astral-sh/uv' && ...
-
-# To:
-if: (github.repository == 'astral-sh/uv' || github.repository == 'chinario/uv') && ...
-```
-
-### For Publishing
-
-If you want to publish to your own PyPI account:
-
-1. Update `.github/workflows/publish-pypi.yml` with your PyPI credentials
-2. Update repository references in the publishing scripts
-
-### For Documentation
-
-Update `.github/workflows/publish-docs.yml` if you want to publish to your own documentation site.
-
-## Running Your Own Builds
-
-After making the appropriate changes to the workflow conditions, your fork will be able to run the same CI/CD processes as the original repository.
-
-## Syncing Updates
-
-To keep your fork up-to-date with the original repository:
-
-1. Run the sync script: `bash scripts/sync-upstream.sh`
-2. Reapply your customizations to the workflows as needed
-3. Test the workflows in a development branch before merging to main
+For publishing workflows to work, you will need to set up the following secrets in your GitHub repository settings:
+- `PYPI_API_TOKEN` for PyPI publishing
+- `CARGO_REGISTRY_TOKEN` for crates.io publishing
+- `ASTRAL_DOCS_PAT` for documentation deployment (if applicable)
+- Any other tokens required for your specific publishing needs
