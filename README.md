@@ -54,6 +54,10 @@ The original repository's GitHub Actions workflows have been preserved in this f
 
 3. See [GITHUB_ACTIONS_GUIDE.md](GITHUB_ACTIONS_GUIDE.md) for detailed instructions on adapting the workflows for your fork.
 
+### Publishing Your Fork
+
+If you want to publish your modified version, see [PUBLISHING_GUIDE.md](PUBLISHING_GUIDE.md) for instructions on setting up automated publishing mechanisms.
+
 ## Installation
 
 Install uv with our standalone installers:
