@@ -23,40 +23,62 @@ An extremely fast Python package and project manager, written in Rust.
 
 ## Fork Information
 
-This repository is a fork of [astral-sh/uv](https://github.com/astral-sh/uv) with custom modifications.
+## Fork Information
 
-### Synchronization
+This repository is a fork of [astral-sh/uv](https://github.com/astral-sh/uv) optimized for building standalone binaries while staying synchronized with upstream.
 
-To sync with the upstream repository, run:
+### 🔄 Automatic Synchronization
 
-```bash
-# Make sure you have the upstream remote configured:
-git remote add upstream https://github.com/astral-sh/uv.git
+This fork automatically syncs with the official uv repository:
 
-# Run the sync script:
-bash scripts/sync-upstream.sh
-```
+1. **Automatic Daily Sync** (GitHub Actions)
+   - Runs daily at 02:00 UTC
+   - Automatically pulls latest changes from `astral-sh/uv`
+   - Creates PR for complex merges requiring manual review
+   - Trigger manually: Go to Actions → "Sync from Upstream" → Run workflow
 
-### Custom Modifications
-
-This fork contains custom modifications to the original uv codebase. When updating from upstream, be careful to preserve these changes.
-
-### GitHub Actions
-
-The original repository's GitHub Actions workflows have been preserved in this fork. To use them properly:
-
-1. Some workflows contain conditions that restrict execution to the official repository (e.g., `github.repository == 'astral-sh/uv'`). These need to be modified to include your fork:
-   ```yaml
-   if: github.repository == 'astral-sh/uv' || github.repository == 'chinario/uv'
+2. **Manual Sync**
+   ```bash
+   bash scripts/sync-upstream.sh
    ```
 
-2. For publishing workflows to work, you'll need to set up appropriate secrets in your repository settings.
+### 🔨 Binary Build System
 
-3. See [GITHUB_ACTIONS_GUIDE.md](GITHUB_ACTIONS_GUIDE.md) for detailed instructions on adapting the workflows for your fork.
+This fork focuses on building standalone binaries across multiple platforms:
 
-### Publishing Your Fork
+- **Trigger:** Push to `main` or create version tags (`v*`)
+- **Platforms:** Linux (x86_64, ARM64), macOS (x86_64, ARM64), Windows (x86_64)
+- **Outputs:** GitHub Releases with pre-built binaries
+- **Workflow:** `.github/workflows/build-binaries-only.yml`
 
-If you want to publish your modified version, see [PUBLISHING_GUIDE.md](PUBLISHING_GUIDE.md) for instructions on setting up automated publishing mechanisms.
+### 📦 Disabled Features
+
+To keep this fork lightweight and focused on binary builds, the following are disabled:
+
+- ❌ PyPI package publishing (`publish-pypi.yml`)
+- ❌ Crates.io publishing (`publish-crates.yml`)
+- ❌ Documentation publishing (`publish-docs.yml`)
+- ❌ CI tests (can be re-enabled if needed)
+
+### 🚀 Quick Setup
+
+First-time setup:
+```bash
+bash scripts/setup-fork-binaries.sh
+```
+
+This will:
+1. Configure upstream remote
+2. Mark publishing workflows as disabled
+3. Display configuration summary
+
+### Building Locally
+
+```bash
+# Build a release binary
+cargo build --release --bin uv --bin uvx
+
+# The binaries will be in: target/release/
 
 ## Installation
 

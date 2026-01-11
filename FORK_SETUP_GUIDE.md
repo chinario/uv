@@ -80,9 +80,36 @@ git fetch upstream/main
 git clone https://github.com/your-username/uv.git
 cd uv
 
+# 配置 git (重要：解决 "divergent branches" 错误)
+bash scripts/init-git-config.sh
+
+# 或手动配置:
+git config pull.ff false
+
 # 运行自动配置脚本
 bash scripts/setup-fork-binaries.sh
 ```
+
+**⚠️ 重要：Git 配置**
+
+如果手动同步时出现以下错误：
+```
+fatal: Need to specify how to reconcile divergent branches.
+```
+
+解决方法：
+```bash
+# 方法 1: 单个仓库配置
+git config pull.ff false
+
+# 方法 2: 全局配置（推荐）
+git config --global pull.ff false
+
+# 方法 3: 自动配置脚本
+bash scripts/init-git-config.sh
+```
+
+这个配置告诉 git 使用 merge 而不是 rebase，允许非快进合并。
 
 ### 步骤 2: 配置 GitHub (可选)
 
