@@ -1,0 +1,144 @@
+name: "Build release binaries (Fork)"
+
+# This workflow builds release binaries for this fork while syncing from upstream
+on:
+  push:
+    branches: [main]
+    tags:
+      - "v*"
+  pull_request:
+    paths:
+      - pyproject.toml
+      - Cargo.toml
+      - .cargo/config.toml
+      - crates/uv-build/Cargo.toml
+      - crates/uv-build/pyproject.toml
+      - Cargo.lock
+      - rust-toolchain.toml
+      - .github/workflows/build-binaries-only.yml
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PACKAGE_NAME: uv
+  MODULE_NAME: uv
+  PYTHON_VERSION: "3.11"
+  CARGO_INCREMENTAL: 0
+  CARGO_NET_RETRY: 10
+  CARGO_TERM_COLOR: always
+  RUSTUP_MAX_RETRIES: 10
+
+permissions:
+  contents: read
+
+jobs:
+  build-binaries:
+    name: "Build ${{ matrix.target }} binary"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Linux x86_64
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            arch: x64
+          # Linux ARM64
+          - os: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+            arch: arm64
+          # macOS x86_64
+          - os: macos-13
+            target: x86_64-apple-darwin
+            arch: x64
+          # macOS ARM64
+          - os: macos-14
+            target: aarch64-apple-darwin
+            arch: arm64
+          # Windows x86_64
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            arch: x64
+    
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be0f245cb558a0176b # v4.1.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+          targets: ${{ matrix.target }}
+
+      - uses: Swatinem/rust-cache@23bce251afb159fac37c1fbea47830e92a58a565 # v2.7.3
+        with:
+          workspaces: ". -> target"
+          cache-targets: "true"
+
+      - name: Build binary (Linux/macOS)
+        if: runner.os != 'Windows'
+        run: |
+          cargo build --release --target ${{ matrix.target }} --bin uv --bin uvx
+          
+          # Create release artifact
+          mkdir -p artifacts
+          if [[ "${{ matrix.target }}" == *"linux"* ]]; then
+            cp target/${{ matrix.target }}/release/uv artifacts/uv-${{ matrix.arch }}-linux
+            cp target/${{ matrix.target }}/release/uvx artifacts/uvx-${{ matrix.arch }}-linux
+          elif [[ "${{ matrix.target }}" == *"darwin"* ]]; then
+            cp target/${{ matrix.target }}/release/uv artifacts/uv-${{ matrix.arch }}-macos
+            cp target/${{ matrix.target }}/release/uvx artifacts/uvx-${{ matrix.arch }}-macos
+          fi
+
+      - name: Build binary (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          cargo build --release --target ${{ matrix.target }} --bin uv --bin uvx
+          mkdir -p artifacts
+          copy target/${{ matrix.target }}/release/uv.exe artifacts/uv-${{ matrix.arch }}-windows.exe
+          copy target/${{ matrix.target }}/release/uvx.exe artifacts/uvx-${{ matrix.arch }}-windows.exe
+        shell: bash
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@26f96dfc697d77e81fd5907df203aa23a56210f4 # v4.3.0
+        with:
+          name: binaries-${{ matrix.target }}
+          path: artifacts/
+          retention-days: 7
+
+  create-release:
+    name: "Create GitHub Release"
+    needs: build-binaries
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
+    
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be0f245cb558a0176b # v4.1.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@6b208ae046db98c579e8a3aa621ab581ff575935 # v4.1.1
+        with:
+          path: all-artifacts
+
+      - name: Merge artifacts
+        run: |
+          mkdir -p release-assets
+          find all-artifacts -type f -exec cp {} release-assets/ \;
+          ls -la release-assets/
+
+      - name: Create Release
+        uses: softprops/action-gh-release@69a2333d3b79d640e68412046e8e7fb33dbe13d8 # v1.9.2
+        with:
+          files: release-assets/*
+          draft: false
+          prerelease: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
+          generate_release_notes: true

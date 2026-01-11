@@ -1,0 +1,89 @@
+name: "Sync from Upstream"
+
+# Automatically sync from upstream uv repository
+on:
+  schedule:
+    # Run daily at 02:00 UTC
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@b4ffde65f46336ab88eb53be0f245cb558a0176b # v4.1.1
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+      - name: Add upstream remote
+        run: |
+          git remote add upstream https://github.com/astral-sh/uv.git || true
+          git remote set-url upstream https://github.com/astral-sh/uv.git
+
+      - name: Fetch upstream
+        run: |
+          git fetch upstream main
+
+      - name: Check for updates
+        id: check-update
+        run: |
+          # Get the latest commit from upstream
+          UPSTREAM_COMMIT=$(git rev-parse upstream/main)
+          CURRENT_COMMIT=$(git rev-parse HEAD)
+          
+          if [ "$UPSTREAM_COMMIT" != "$CURRENT_COMMIT" ]; then
+            echo "has-updates=true" >> $GITHUB_OUTPUT
+            echo "upstream-commit=$UPSTREAM_COMMIT" >> $GITHUB_OUTPUT
+            echo "commit-message=$(git log -1 --pretty=format:'%s' upstream/main)" >> $GITHUB_OUTPUT
+          else
+            echo "has-updates=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Merge upstream
+        if: steps.check-update.outputs.has-updates == 'true'
+        run: |
+          git merge upstream/main --no-edit -m "chore: sync with upstream uv (${{ steps.check-update.outputs.upstream-commit }})" || {
+            echo "Merge conflict detected, attempting auto-resolve..."
+            
+            # Auto-resolve by keeping upstream version for most files
+            git diff --name-only --diff-filter=U | grep -v '.github/workflows' | xargs git checkout --theirs -- || true
+            
+            # Keep our custom workflows
+            git checkout --ours .github/workflows/sync-upstream.yml || true
+            git checkout --ours .github/workflows/build-binaries-only.yml || true
+            
+            git add -A
+            git commit -m "chore: sync with upstream uv (${{ steps.check-update.outputs.upstream-commit }}) - auto resolved conflicts"
+          }
+
+      - name: Push changes
+        if: steps.check-update.outputs.has-updates == 'true'
+        run: |
+          git push origin main
+
+      - name: Create PR for complex merges (if needed)
+        if: failure() && steps.check-update.outputs.has-updates == 'true'
+        uses: peter-evans/create-pull-request@6d6857d36972b65feb161a90c5a740f2d11110f1 # v5.0.0
+        with:
+          commit-message: "chore: sync with upstream uv - manual review required"
+          title: "⚙️ Sync from upstream uv (requires manual review)"
+          body: |
+            This PR contains updates from the upstream uv repository.
+            
+            **Upstream commit:** `${{ steps.check-update.outputs.upstream-commit }}`
+            **Upstream message:** ${{ steps.check-update.outputs.commit-message }}
+            
+            Merge conflicts were detected and need manual resolution. Please review the changes carefully.
+          branch: sync-upstream-${{ steps.check-update.outputs.upstream-commit }}
+          delete-branch: true
