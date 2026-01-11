@@ -7,7 +7,9 @@
 [![Actions status](https://github.com/astral-sh/uv/actions/workflows/ci.yml/badge.svg)](https://github.com/astral-sh/uv/actions)
 [![Discord](https://img.shields.io/badge/Discord-%235865F2.svg?logo=discord&logoColor=white)](https://discord.gg/astral-sh)
 
-An extremely fast Python package and project manager, written in Rust.
+**语言:** [简体中文](README.md) | [English](README.en.md)
+
+一个极其快速的 Python 包和项目管理器，用 Rust 编写。
 
 <p align="center">
   <picture align="center">
@@ -18,115 +20,121 @@ An extremely fast Python package and project manager, written in Rust.
 </p>
 
 <p align="center">
-  <i>Installing <a href="https://trio.readthedocs.io/">Trio</a>'s dependencies with a warm cache.</i>
+  <i>使用预热缓存安装 <a href="https://trio.readthedocs.io/">Trio</a> 的依赖项。</i>
 </p>
 
-## Fork Information
+## Fork 信息
 
-## Fork Information
+这是 [astral-sh/uv](https://github.com/astral-sh/uv) 的 fork，优化用于构建独立二进制文件，同时与上游保持同步。
 
-This repository is a fork of [astral-sh/uv](https://github.com/astral-sh/uv) optimized for building standalone binaries while staying synchronized with upstream.
+### 🔄 自动同步
 
-### 🔄 Automatic Synchronization
+本 fork 会自动与官方 uv 仓库同步：
 
-This fork automatically syncs with the official uv repository:
+1. **自动日常同步**（GitHub Actions）
+   - 每天 UTC 02:00 运行
+   - 自动从 `astral-sh/uv` 拉取最新变化
+   - 复杂合并时创建 PR 进行手动审查
+   - 手动触发：进入 Actions → "Sync from Upstream" → 运行工作流
 
-1. **Automatic Daily Sync** (GitHub Actions)
-   - Runs daily at 02:00 UTC
-   - Automatically pulls latest changes from `astral-sh/uv`
-   - Creates PR for complex merges requiring manual review
-   - Trigger manually: Go to Actions → "Sync from Upstream" → Run workflow
-
-2. **Manual Sync**
+2. **手动同步**
    ```bash
    bash scripts/sync-upstream.sh
    ```
 
-### 🔨 Binary Build System
+### 🔨 二进制构建系统
 
-This fork focuses on building standalone binaries across multiple platforms:
+本 fork 专注于跨多个平台构建独立二进制文件：
 
-- **Trigger:** Push to `main` or create version tags (`v*`)
-- **Platforms:** Linux (x86_64, ARM64), macOS (x86_64, ARM64), Windows (x86_64)
-- **Outputs:** GitHub Releases with pre-built binaries
-- **Workflow:** `.github/workflows/build-binaries-only.yml`
+- **触发方式：** 推送到 `main` 或创建版本标签 (`v*`)
+- **平台支持：** Linux (x86_64、ARM64)、macOS (x86_64、ARM64)、Windows (x86_64)
+- **输出内容：** GitHub Releases 中的预编译二进制文件
+- **工作流：** `.github/workflows/build-binaries-only.yml`
 
-### 📦 Disabled Features
+### 📦 禁用的功能
 
-To keep this fork lightweight and focused on binary builds, the following are disabled:
+为了保持本 fork 的轻量级并专注于二进制构建，以下功能已禁用：
 
-- ❌ PyPI package publishing (`publish-pypi.yml`)
-- ❌ Crates.io publishing (`publish-crates.yml`)
-- ❌ Documentation publishing (`publish-docs.yml`)
-- ❌ CI tests (can be re-enabled if needed)
+- ❌ PyPI 包发布（`publish-pypi.yml`）
+- ❌ Crates.io 发布（`publish-crates.yml`）
+- ❌ 文档发布（`publish-docs.yml`）
+- ❌ CI 测试（如需可重新启用）
 
-### 🚀 Quick Setup
+### 🚀 快速设置
 
-First-time setup:
+首次设置：
 ```bash
+bash scripts/init-git-config.sh
 bash scripts/setup-fork-binaries.sh
+bash scripts/sync-upstream.sh
 ```
 
-This will:
-1. Configure upstream remote
-2. Mark publishing workflows as disabled
-3. Display configuration summary
+这将：
+1. 配置 git 以正确处理合并
+2. 配置 upstream 远程
+3. 标记发布工作流为已禁用
+4. 显示配置摘要
 
-### Building Locally
+### 本地构建
 
 ```bash
-# Build a release binary
+# 构建发布二进制
 cargo build --release --bin uv --bin uvx
 
-# The binaries will be in: target/release/
+# 二进制文件将在：target/release/
+```
 
-## Installation
+## 安装
 
-Install uv with our standalone installers:
+使用我们的独立安装程序安装 uv：
 
 ```bash
-# On macOS and Linux.
+# 在 macOS 和 Linux 上
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
 ```bash
-# On Windows.
+# 在 Windows 上
 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
-Or, from [PyPI](https://pypi.org/project/uv/):
+或从 [PyPI](https://pypi.org/project/uv/) 安装：
 
 ```bash
-# With pip.
+# 使用 pip
 pip install uv
 ```
 
 ```bash
-# Or pipx.
+# 或 pipx
 pipx install uv
 ```
 
-If installed via the standalone installer, uv can update itself to the latest version:
+如果通过独立安装程序安装，uv 可以自我更新到最新版本：
 
 ```bash
 uv self update
 ```
 
-See the [installation documentation](https://docs.astral.sh/uv/getting-started/installation/) for
-details and alternative installation methods.
+详见[安装文档](https://docs.astral.sh/uv/getting-started/installation/)了解详情和其他安装方法。
 
-## Documentation
+## 文档
 
-uv's documentation is available at [docs.astral.sh/uv](https://docs.astral.sh/uv).
+uv 的文档可在 [docs.astral.sh/uv](https://docs.astral.sh/uv) 获得。
 
-Additionally, the command line reference documentation can be viewed with `uv help`.
+另外，命令行参考文档可通过 `uv help` 查看。
 
-## Features
+### Fork 特定文档
 
-### Projects
+- [FORK_SETUP_GUIDE.md](FORK_SETUP_GUIDE.md) - 详细的设置和配置指南
+- [TROUBLESHOOTING.md](TROUBLESHOOTING.md) - 故障排除和常见问题
+- [QUICK_REFERENCE.md](QUICK_REFERENCE.md) - 常见任务的快速参考
 
-uv manages project dependencies and environments, with support for lockfiles, workspaces, and more,
-similar to `rye` or `poetry`:
+## 功能特性
+
+### 项目管理
+
+uv 管理项目依赖和环境，支持锁文件、工作区等功能，类似于 `rye` 或 `poetry`：
 
 ```console
 $ uv init example
@@ -154,16 +162,15 @@ Resolved 2 packages in 0.70ms
 Audited 1 package in 0.02ms
 ```
 
-See the [project documentation](https://docs.astral.sh/uv/guides/projects/) to get started.
+详见[项目文档](https://docs.astral.sh/uv/guides/projects/)了解如何开始。
 
-uv also supports building and publishing projects, even if they're not managed with uv. See the
-[publish guide](https://docs.astral.sh/uv/guides/publish/) to learn more.
+uv 也支持构建和发布项目，即使它们不是用 uv 管理的。详见[发布指南](https://docs.astral.sh/uv/guides/publish/)了解更多信息。
 
-### Scripts
+### 脚本
 
-uv manages dependencies and environments for single-file scripts.
+uv 管理单文件脚本的依赖和环境。
 
-Create a new script and add inline metadata declaring its dependencies:
+创建新脚本并添加内联元数据声明其依赖：
 
 ```console
 $ echo 'import requests; print(requests.get("https://astral.sh"))' > example.py
@@ -172,7 +179,7 @@ $ uv add --script example.py requests
 Updated `example.py`
 ```
 
-Then, run the script in an isolated virtual environment:
+然后在隔离的虚拟环境中运行脚本：
 
 ```console
 $ uv run example.py
@@ -182,13 +189,13 @@ Installed 5 packages in 12ms
 <Response [200]>
 ```
 
-See the [scripts documentation](https://docs.astral.sh/uv/guides/scripts/) to get started.
+详见[脚本文档](https://docs.astral.sh/uv/guides/scripts/)了解如何开始。
 
-### Tools
+### 工具
 
-uv executes and installs command-line tools provided by Python packages, similar to `pipx`.
+uv 执行和安装 Python 包提供的命令行工具，类似于 `pipx`。
 
-Run a tool in an ephemeral environment using `uvx` (an alias for `uv tool run`):
+使用 `uvx` (是 `uv tool run` 的别名) 在临时环境中运行工具：
 
 ```console
 $ uvx pycowsay 'hello world!'
@@ -207,7 +214,7 @@ Installed 1 package in 9ms
            ||     ||
 ```
 
-Install a tool with `uv tool install`:
+使用 `uv tool install` 安装工具：
 
 ```console
 $ uv tool install ruff
@@ -220,13 +227,13 @@ $ ruff --version
 ruff 0.5.0
 ```
 
-See the [tools documentation](https://docs.astral.sh/uv/guides/tools/) to get started.
+详见[工具文档](https://docs.astral.sh/uv/guides/tools/)了解如何开始。
 
-### Python versions
+### Python 版本
 
-uv installs Python and allows quickly switching between versions.
+uv 安装 Python 并允许在不同版本之间快速切换。
 
-Install multiple Python versions:
+安装多个 Python 版本：
 
 ```console
 $ uv python install 3.12 3.13 3.14
@@ -237,7 +244,7 @@ Installed 3 versions in 972ms
 
 ```
 
-Download Python versions as needed:
+按需下载 Python 版本：
 
 ```console
 $ uv venv --python 3.12.0
@@ -252,28 +259,24 @@ Type "help", "copyright", "credits" or "license" for more information.
 >>>>
 ```
 
-Use a specific Python version in the current directory:
+在当前目录使用特定的 Python 版本：
 
 ```console
 $ uv python pin 3.11
 Pinned `.python-version` to `3.11`
 ```
 
-See the [Python installation documentation](https://docs.astral.sh/uv/guides/install-python/) to get
-started.
+详见 [Python 安装文档](https://docs.astral.sh/uv/guides/install-python/)了解如何开始。
 
-### The pip interface
+### pip 接口
 
-uv provides a drop-in replacement for common `pip`, `pip-tools`, and `virtualenv` commands.
+uv 为常见的 `pip`、`pip-tools` 和 `virtualenv` 命令提供完全兼容的替代品。
 
-uv extends their interfaces with advanced features, such as dependency version overrides,
-platform-independent resolutions, reproducible resolutions, alternative resolution strategies, and
-more.
+uv 通过依赖版本覆盖、平台独立解析、可重现解析、替代解析策略等高级功能扩展了它们的接口。
 
-Migrate to uv without changing your existing workflows — and experience a 10-100x speedup — with the
-`uv pip` interface.
+使用 `uv pip` 接口在不改变现有工作流的情况下迁移到 uv——并体验 10-100 倍的速度提升。
 
-Compile requirements into a platform-independent requirements file:
+将需求编译为平台独立的需求文件：
 
 ```console
 $ uv pip compile docs/requirements.in \
@@ -282,7 +285,7 @@ $ uv pip compile docs/requirements.in \
 Resolved 43 packages in 12ms
 ```
 
-Create a virtual environment:
+创建虚拟环境：
 
 ```console
 $ uv venv
@@ -291,7 +294,7 @@ Creating virtual environment at: .venv
 Activate with: source .venv/bin/activate
 ```
 
-Install the locked requirements:
+安装锁定的需求：
 
 ```console
 $ uv pip sync docs/requirements.txt
@@ -303,61 +306,48 @@ Installed 43 packages in 208ms
  ...
 ```
 
-See the [pip interface documentation](https://docs.astral.sh/uv/pip/index/) to get started.
+详见 [pip 接口文档](https://docs.astral.sh/uv/pip/index/)了解如何开始。
 
-## Contributing
+## 贡献
 
-We are passionate about supporting contributors of all levels of experience and would love to see
-you get involved in the project. See the
-[contributing guide](https://github.com/astral-sh/uv?tab=contributing-ov-file#contributing) to get
-started.
+我们热衷于支持各种经验水平的贡献者，希望看到您参与项目。详见[贡献指南](https://github.com/astral-sh/uv?tab=contributing-ov-file#contributing)了解如何开始。
 
-## FAQ
+## 常见问题
 
-#### How do you pronounce uv?
+#### uv 怎么发音？
 
-It's pronounced as "you - vee" ([`/juː viː/`](https://en.wikipedia.org/wiki/Help:IPA/English#Key))
+发音为 "you - vee" ([`/juː viː/`](https://en.wikipedia.org/wiki/Help:IPA/English#Key))
 
-#### How should I stylize uv?
+#### uv 应该如何风格化？
 
-Just "uv", please. See the [style guide](./STYLE.md#styling-uv) for details.
+仅为 "uv"。详见[风格指南](./STYLE.md#styling-uv)。
 
-#### What platforms does uv support?
+#### uv 支持哪些平台？
 
-See uv's [platform support](https://docs.astral.sh/uv/reference/platforms/) document.
+详见 uv 的[平台支持](https://docs.astral.sh/uv/reference/platforms/)文档。
 
-#### Is uv ready for production?
+#### uv 已经可用于生产吗？
 
-Yes, uv is stable and widely used in production. See uv's
-[versioning policy](https://docs.astral.sh/uv/reference/versioning/) document for details.
+是的，uv 是稳定的，被广泛用于生产。详见 uv 的[版本化政策](https://docs.astral.sh/uv/reference/versioning/)文档。
 
-## Acknowledgements
+## 致谢
 
-uv's dependency resolver uses [PubGrub](https://github.com/pubgrub-rs/pubgrub) under the hood. We're
-grateful to the PubGrub maintainers, especially [Jacob Finkelman](https://github.com/Eh2406), for
-their support.
+uv 的依赖解析器在底层使用 [PubGrub](https://github.com/pubgrub-rs/pubgrub)。我们感谢 PubGrub 的维护者，特别是 [Jacob Finkelman](https://github.com/Eh2406) 的支持。
 
-uv's Git implementation is based on [Cargo](https://github.com/rust-lang/cargo).
+uv 的 Git 实现基于 [Cargo](https://github.com/rust-lang/cargo)。
 
-Some of uv's optimizations are inspired by the great work we've seen in [pnpm](https://pnpm.io/),
-[Orogene](https://github.com/orogene/orogene), and [Bun](https://github.com/oven-sh/bun). We've also
-learned a lot from Nathaniel J. Smith's [Posy](https://github.com/njsmith/posy) and adapted its
-[trampoline](https://github.com/njsmith/posy/tree/main/src/trampolines/windows-trampolines/posy-trampoline)
-for Windows support.
+uv 的一些优化受到了 [pnpm](https://pnpm.io/)、[Orogene](https://github.com/orogene/orogene) 和 [Bun](https://github.com/oven-sh/bun) 的启发。我们也从 Nathaniel J. Smith 的 [Posy](https://github.com/njsmith/posy) 学到了很多，并为 Windows 支持改编了其[蹦床](https://github.com/njsmith/posy/tree/main/src/trampolines/windows-trampolines/posy-trampoline)。
 
-## License
+## 许可证
 
-uv is licensed under either of
+uv 是在以下任一许可证下授权的
 
-- Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or
-  <https://www.apache.org/licenses/LICENSE-2.0>)
-- MIT license ([LICENSE-MIT](LICENSE-MIT) or <https://opensource.org/licenses/MIT>)
+- Apache 许可证 2.0 版本 ([LICENSE-APACHE](LICENSE-APACHE) 或 <https://www.apache.org/licenses/LICENSE-2.0>)
+- MIT 许可证 ([LICENSE-MIT](LICENSE-MIT) 或 <https://opensource.org/licenses/MIT>)
 
-at your option.
+由您选择。
 
-Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in uv
-by you, as defined in the Apache-2.0 license, shall be dually licensed as above, without any
-additional terms or conditions.
+除非您明确说明，否则任何有意提交至 uv 的贡献，如 Apache-2.0 许可证定义，应以上述方式双重许可，不带任何附加条款或条件。
 
 <div align="center">
   <a target="_blank" href="https://astral.sh" style="background:none">
