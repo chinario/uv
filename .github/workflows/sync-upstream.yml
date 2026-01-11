@@ -1,6 +1,7 @@
 name: "Sync from Upstream"
 
 # Automatically sync from upstream uv repository
+# Note: Uses stable versions of all actions
 on:
   schedule:
     # Run daily at 02:00 UTC
