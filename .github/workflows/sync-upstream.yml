@@ -74,7 +74,7 @@ jobs:
 
       - name: Create PR for complex merges (if needed)
         if: failure() && steps.check-update.outputs.has-updates == 'true'
-        uses: peter-evans/create-pull-request@6d6857d36972b65feb161a90c5a740f2d11110f1 # v5.0.0
+        uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
         with:
           commit-message: "chore: sync with upstream uv - manual review required"
           title: "⚙️ Sync from upstream uv (requires manual review)"
