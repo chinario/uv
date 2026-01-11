@@ -1,3 +1,4 @@
+# DISABLED FOR FORK - Only use build-binaries-only.yml
 # Publish a release to crates.io.
 #
 # Assumed to run as a subworkflow of .github/workflows/release.yml; specifically, as a publish job
